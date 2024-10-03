@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="bg" style="background-image: url('{% static 'images/Login_final.jpg' %}'); background-size: cover; background-position: top center; height: calc(100vh - 56px); padding-top: 56px; position: relative;">
+    <div class="container d-flex align-items-center justify-content-center" style="margin-left: 0; height: 100%; flex-direction: column; position: relative;">
+        <div class="row text-center" style="z-index: 2;">
+            <div class="col-12">
+                <form method="POST" class="text-center">
+                    {% csrf_token %}
+                    <!-- Stack buttons one below the other using block-level display -->
+                    <button type="submit" name="action" value="video" class="btn" style="background-color: #928602; color: white; font-weight: bold; font-size: 1.25rem; padding: 1rem; margin: 0.5rem; width: 100%;">Upload Video</button>
+                    <button type="submit" name="action" value="image" class="btn" style="background-color: #928602; color: white; font-weight: bold; font-size: 1.25rem; padding: 1rem; margin: 0.5rem; width: 100%;">Upload Image</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block js_cripts %}
+<script src="{% static 'js/script.js' %}"></script>
+{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
+{% endblock %}

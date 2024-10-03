@@ -1,0 +1,155 @@
+body {
+    height: 100%;
+}
+.bg {
+    /* The image used */
+    background-image: url("Django Application/static/images/thumpdown.png");
+  
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+  
+    /* Center and scale the image nicely */
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+
+
+}
+
+section{
+    padding-top: 60px;
+}
+
+.width-300{
+    width: 300px;
+    margin: auto;
+    padding: 20px;
+    box-shadow: 0 0px 9px 2px #ccc;
+}
+
+.width-400{
+    width: 400px;
+    margin: auto;
+    padding: 20px;
+    margin-top: 80px;
+    margin-bottom: 150px;
+    box-shadow: 0 0px 9px 2px #ccc;
+}
+
+.width-500{
+    width: 500px;
+    margin: auto;
+    padding: 20px;
+    box-shadow: 0 0px 9px 2px #ccc;
+}
+
+#videos{
+    display: none;
+}
+
+canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.preprocess {
+    padding-right: 20px;
+    padding-bottom: 50px;
+}
+
+#preprocessed_images {
+  white-space: nowrap;
+  width: auto;
+  height: 250px;
+  padding: 20px;
+  overflow-x: scroll;
+  overflow-y: hidden;
+  box-shadow: 0 0px 9px 2px #ccc;
+}
+
+#faces_images {
+    white-space: nowrap;
+    width: auto;
+    height: 150px;
+    padding: 20px;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    box-shadow: 0 0px 9px 2px #ccc;
+}
+
+.faces {
+    padding-right: 20px;
+    padding-bottom: 50px;
+}
+
+#heatmap_images{
+    white-space: nowrap;
+    width: auto;
+    height: 200px;
+    padding: 20px;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    box-shadow: 0 0px 9px 2px #ccc;
+    margin-bottom: 20px;
+}
+
+.heat-map {
+    padding-right: 20px;
+    padding-bottom: 50px;
+}
+/* Style for the file input text */
+input[type="file"] {
+    color: white !important;
+    font-weight: bold !important;
+}
+
+/* Style for when a file is selected (the filename) */
+input[type="file"]::file-selector-button {
+    color: white !important;
+    font-weight: bold !important;
+}
+
+/* Ensuring text is bold for labels */
+label {
+    color: white;
+    font-weight: bold;
+}
+
+/* Making the slider text bold and white */
+#slider-value {
+    font-weight: bold;
+    color: white;
+}
+/* Hide the default file input text */
+input[type="file"]::-webkit-file-upload-button {
+    visibility: hidden; /* Hide default button */
+}
+
+input[type="file"]:before {
+   
+    color: white; /* White text color */
+    font-weight: bold; /* Bold text */
+    display: inline-block;
+    padding: 5px;
+    background-color: transparent;
+    border: 1px solid #fff;
+    border-radius: 5px;
+}
+
+/* Optionally style the input field */
+input[type="file"] {
+    width: 100%;
+    padding: 8px;
+    background-color: transparent;
+    color: transparent;
+}
+.btn-light-green {
+    background-color: #928602; /* Light green */
+    color: white;
+    border: none;
+}
+.btn-light-green:hover {
+    background-color: #948603; /* Darker green on hover */
+}

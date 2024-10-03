@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="bg" style="background-image: url('{% static 'images/action_final.jpg' %}'); background-size: cover; background-position: top center; height: calc(100vh - 56px); padding-top: 56px;">
+    <div class="container" style="margin-left: 0;">
+        <div class="row">
+            <div class="col-12 my-auto text-center">
+                <div class="width-400">
+                    <!-- Image Preview -->
+                    <img id="image_preview" src="" alt="Uploaded Image" style="max-width: 100%; display: none;" />
+                    
+                    <!-- Image Upload Form -->
+                    <form class="form mt-4" method="POST" enctype="multipart/form-data" name="image-upload" id="image-upload" class="text-center mt-3">
+                        {% csrf_token %}
+                        
+                        <div class="form-group mt-4">
+                            <label class="text-white font-weight-bold">{{ form.upload_image_file.label_tag }}</label>
+                            {{ form.upload_image_file }}
+                            <span id="filename" class="text-white font-weight-bold mt-2"></span> <!-- Default message -->
+                            
+                            {% if form.upload_image_file.errors %}
+                                {% for each_error in form.upload_image_file.errors %}
+                                    <div class="alert alert-danger mt-1 {{ form.upload_image_file.id_for_label }}">
+                                        {{ each_error }}
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                        
+                        <button id="imageUpload" type="submit" name="submit" class="btn btn-success mt-3 btn-block">Upload</button>
+                    </form>
+                </div>
+
+                <!-- Display the uploaded image after form submission -->
+                {% if request.session.file_name %}
+                <div class="mt-4">
+                    <h5 class="text-white">Uploaded Image:</h5>
+                    <img src="{{ IMAGE_MEDIA_URL }}{{ request.session.file_name }}" alt="Uploaded Image" class="img-fluid mt-2" style="max-width: 100%;">
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block js_cripts %}
+<script src="{% static 'js/script.js' %}"></script>
+<script>
+    $(function () {
+        // Display filename and preview image after file selection
+        $('#{{ form.upload_image_file.id_for_label }}').on('change', function() {
+            var fileName = $(this).val().split('\\').pop(); // Get the filename from the full path
+            if (fileName) {
+                $('#filename').text(fileName); // Set the text of the filename span
+
+                // Preview image
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    $('#image_preview').attr('src', e.target.result).show(); // Display the image
+                }
+                reader.readAsDataURL(this.files[0]); // Read the selected image file
+            }
+        });
+    });
+</script>
+{% endblock %}
