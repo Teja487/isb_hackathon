@@ -465,7 +465,8 @@ def image_index(request):
 
             # Save the image file to the 'image_uploaded' folder using IMAGE_MEDIA_ROOT
             saved_image_file = 'uploaded_image_' + str(int(time.time())) + "." + image_file_ext
-            image_upload_path = os.path.join(settings.IMAGE_MEDIA_ROOT, saved_image_file)
+            #image_path = os.path.join(settings.PROJECT_DIR, 'uploaded_images', image_name)
+            image_upload_path = os.path.join(settings.PROJECT_DIR, 'image_uploaded', saved_image_file)
 
             # Save the file
             if settings.DEBUG:
@@ -474,7 +475,8 @@ def image_index(request):
                 request.session['file_name'] = image_upload_path
             else:
                 # In production mode, save the file to the appropriate directory
-                image_upload_path = os.path.join(settings.IMAGE_MEDIA_ROOT, 'app', 'image_uploaded', saved_image_file)
+                #image_upload_path = os.path.join(settings.IMAGE_MEDIA_ROOT, 'app', 'image_uploaded', saved_image_file)
+                image_upload_path = os.path.join(settings.PROJECT_DIR, 'app','image_uploaded', saved_image_file)
                 with open(image_upload_path, 'wb') as img_file:
                     shutil.copyfileobj(image_file, img_file)
                 request.session['file_name'] = image_upload_path
@@ -500,11 +502,12 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Build paths inside the project like this: os.path.join(PROJECT_DIR, ...)
 PROJECT_DIR = os.path.abspath(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-IMAGE_MEDIA_ROOT = os.path.join(settings.BASE_DIR, 'IMAGE_UPLOADED')
+#IMAGE_MEDIA_ROOT = os.path.join(settings.BASE_DIR, 'IMAGE_UPLOADED')
 IMAGE_MEDIA_ROOT = os.path.join(PROJECT_DIR, 'image_uploaded')
 
 def load_model():
-    # Load the model from the models directory
+    # Load the model from the models directory4
+    print("loading modelllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll")
     model_json_path = os.path.join(settings.BASE_DIR, 'models', 'model.json')
     weights_path = os.path.join(settings.BASE_DIR, 'models', 'model.weights.h5')
     
@@ -516,45 +519,137 @@ def load_model():
     loaded_model = tf.keras.models.model_from_json(loaded_model_json)
     loaded_model.load_weights(weights_path)
     
+    print(" modelllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll loadedddddddddddddddddddddddddddddddddddddddds")
+    
     return loaded_model
 
 # Preprocess the image for prediction
+# def preprocess_image(image_path):
+#     print("entering preprocess functionnnnnnnnnnnnnnnnnnnnnn")
+#     img = cv2.imread(image_path)
+#     print("done readingggggggggggggggggggggggggggggggggggg")
+#     img = cv2.resize(img, (224, 224)) 
+#     print("dddddddddddddddddddddddddddddddddddddddddddd")# Resize for the model input
+#     img = tf.keras.applications.efficientnet.preprocess_input(img)
+#     return img
 def preprocess_image(image_path):
+    print("Entering preprocess function")
     img = cv2.imread(image_path)
-    img = cv2.resize(img, (224, 224))  # Resize for the model input
+    print(f"Done reading image: {image_path}")  # Print image path after reading
+    img = cv2.resize(img, (224, 224)) 
+    print("Resized image")  # Resize for the model input
     img = tf.keras.applications.efficientnet.preprocess_input(img)
     return img
 
+# def image_predict(request):
+#     if request.method == 'POST' and request.FILES.get('upload_image_file'):
+#         # Handle file upload
+#         print("************&&&&&&&&&&&&&&&&&&&&&&&&&&&&&**************")
+#         upload_image_file = request.FILES['upload_image_file']
+#         fs = FileSystemStorage(location=IMAGE_MEDIA_ROOT)  # Save in IMAGE_UPLOADED folder
+#         filename = fs.save(upload_image_file.name, upload_image_file)
+#         uploaded_image_path = os.path.join(IMAGE_MEDIA_ROOT, filename)
+#         print("***********************************************************")
+
+#         # Load the model
+#         model = load_model()
+
+#         # Preprocess the image
+#         processed_image = preprocess_image(uploaded_image_path)
+#         processed_image = np.expand_dims(processed_image, axis=0)  # Add batch dimension
+
+#         # Make prediction
+#         prediction = model.predict(processed_image)
+#         predicted_class = "REAL" if prediction[0, 0] > 0.33 else "FAKE"
+
+#         # Create context to render the result
+#         context = {
+#             'uploaded_image': os.path.join(settings.IMAGE_MEDIA_URLS, filename),
+#             'predicted_class': predicted_class,
+#             'confidence': prediction[0, 0]
+#         }
+#         if settings.DEBUG:
+#                 return render(request, image_predict_name, context)
+#         else:
+#                 return render(request, image_predict_name, context)
+
 def image_predict(request):
-    if request.method == 'POST' and request.FILES.get('upload_image_file'):
-        # Handle file upload
-        upload_image_file = request.FILES['upload_image_file']
-        fs = FileSystemStorage(location=IMAGE_MEDIA_ROOT)  # Save in IMAGE_UPLOADED folder
-        filename = fs.save(upload_image_file.name, upload_image_file)
-        uploaded_image_path = os.path.join(IMAGE_MEDIA_ROOT, filename)
+    if request.method == "GET":
+        # Redirect to 'home' if 'file_name' is not in session
+        if 'file_name' not in request.session:
+            return redirect("ml_app:home")
+        if 'file_name' in request.session:
+            print("************&&&&&&&&&&&&&&&&&&&&&&&&&&&&&**************")
+            upload_image_file = request.session['file_name']
+        upload_image_file = os.path.basename(upload_image_file)
+        print(f"Uploaded image file path: {upload_image_file}")
+        upload_image_file_only = os.path.splitext(upload_image_file)[0]
+        # Production environment adjustments
+        if not settings.DEBUG:
+            production_video_name = os.path.join('/home/app/staticfiles/', upload_image_file.split('/')[3])
+            print("Production file name", production_video_name)
+        else:
+            production_video_name = upload_image_file
+
+        # fs = FileSystemStorage(location=IMAGE_MEDIA_ROOT)  # Save in IMAGE_UPLOADED folder
+        # filename = fs.save(upload_image_file.name, upload_image_file)
+        
+        #uploaded_image_path = os.path.join(settings.MEDIA_ROOT, upload_image_file)
+        uploaded_image_path = os.path.join(settings.PROJECT_DIR, 'image_uploaded', upload_image_file)
+        #uploaded_image_path = os.path.join(settings.PROJECTDIR, 'image_uploaded', upload_image_file)
+        print(f"Updateeeeeeeeedddddddddddddddd :{uploaded_image_path}")
+    
+        # image_upload_path = os.path.join(settings.IMAGE_MEDIA_ROOT, saved_image_file)    
+    # if request.method == 'GET' and request.FILES.get('upload_image_file'):
+    #     # Handle file upload
+    #     print("************&&&&&&&&&&&&&&&&&&&&&&&&&&&&&**************")
+    #     upload_image_file = request.FILES['upload_image_file']
+    #     fs = FileSystemStorage(location=IMAGE_MEDIA_ROOT)  # Save in IMAGE_UPLOADED folder
+    #     filename = fs.save(upload_image_file.name, upload_image_file)
+    #     uploaded_image_path = os.path.join(IMAGE_MEDIA_ROOT, filename)
+    #     print("***********************************************************")
 
         # Load the model
+        print("********************************8")
         model = load_model()
+        print("model loading doneeeeeeeeeeeeeeeeeeeee")
+        #image_upload_path = os.path.join(settings.IMAGE_MEDIA_ROOT, saved_image_file)
 
         # Preprocess the image
         processed_image = preprocess_image(uploaded_image_path)
         processed_image = np.expand_dims(processed_image, axis=0)  # Add batch dimension
+        print("doneeee with processinggggggggggggggggg")
 
         # Make prediction
         prediction = model.predict(processed_image)
-        predicted_class = "REAL" if prediction[0, 0] > 0.33 else "FAKE"
+        predicted_class = "FAKE" if prediction[0, 0] > 0.5 else "REAL"
+        print(f"predicted classssssssssss:{predicted_class}")
+        print(f"confidenceeeeeeeeee:{prediction[0,0]}")
+        #uploaded_image=os.path.join(settings.BASE_DIR, 'image_uploaded', upload_image_file)
+        # Create context to render the 
+ 
 
-        # Create context to render the result
+# Assuming `upload_image_file` is the name of your uploaded image file
+        uploaded_image = os.path.join(settings.MEDIA_URL, 'image_uploaded', upload_image_file)
+# Make sure it looks something like: '/media/image_uploaded/your_image_file.jpg'
+
         context = {
-            'uploaded_image': os.path.join(settings.IMAGE_MEDIA_URLS, filename),
+            'uploaded_image': uploaded_image,
             'predicted_class': predicted_class,
             'confidence': prediction[0, 0]
         }
-        if settings.DEBUG:
-                return render(request, image_predict_name, context)
-        else:
-                return render(request, image_predict_name, context)
 
+        # context = {
+       
+        #     'uploaded_image': uploaded_image,
+        #     'predicted_class': predicted_class,
+        #     'confidence': prediction[0, 0]
+        # }
+        print(context)
+        return render(request, image_predict_name, context)  # Always return HttpResponse
+    else:
+        # Handle case where the method is not POST or file is not uploaded
+        return render(request, '404.html')  # Adjust to the correct template
 
 
 def about(request):

@@ -113,8 +113,10 @@ MEDIA_URL = "/media/"
 
 MEDIA_ROOT = os.path.join(PROJECT_DIR, 'uploaded_videos')
 # Media URL and Root for Images (New variables for image uploads)
-IMAGE_MEDIA_URL = "/media/images/"
+IMAGE_MEDIA_URL = "/media/"
 IMAGE_MEDIA_ROOT = os.path.join(PROJECT_DIR, 'image_uploaded')
+IM_MEDIA_URL = '/media/'
+IM_MEDIA_ROOT = os.path.join(PROJECT_DIR, 'image_uploaded')
 
 #for extra logging in production environment
 if DEBUG == False:

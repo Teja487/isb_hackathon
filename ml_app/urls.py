@@ -3,6 +3,8 @@
 from django.contrib import admin
 from django.urls import path, include
 from . import views
+from django.conf import settings
+from django.conf.urls.static import static
 from .views import about, index, predict_page,cuda_full,entry_page,image_index,image_predict
 
 app_name = 'ml_app'
@@ -18,6 +20,8 @@ urlpatterns = [
     path('predict/', predict_page, name='predict'),
     path('cuda_full/',cuda_full,name='cuda_full'),
 ]
+if settings.DEBUG:
+    urlpatterns += static(settings.IMAGE_MEDIA_URL, document_root=settings.IMAGE_MEDIA_ROOT)
 
 from django.urls import path
 from . import views

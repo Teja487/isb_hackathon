@@ -1,69 +1,30 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block content %}
-<div class="container">
-  <div class="logo text-center mb-3">
-    <img src="{% static 'images/logo1.png' %}" alt="Logo">
-  </div>
-  <hr />
+<div class="bg" style="background-image: url('{% static 'images/df.jpg' %}'); background-size: cover; background-position: center center; height: auto; min-height: 100vh; padding-top: 50px;">
+  <div class="container" style="max-width: 800px; margin: 0 auto; background-color: rgba(0, 0, 0, 0.6); padding: 20px; border-radius: 10px;">
+    <h3 style="font-weight: bold; color: white; font-size: 43px; text-align: center;">DeepFake Image Detection Result</h3>
 
-  <div class="result text-center">
-    <h3>Uploaded Image</h3>
-    <!-- Display the uploaded image using the correct IMAGE_MEDIA_URL -->
-    <img src="{{ IMAGE_MEDIA_URL }}{{ uploaded_image }}" alt="Uploaded Image" id="uploaded_image" height="320" width="auto" />
+    <div class="result text-center">
+      <h3 style="color: white; font-weight: bold;">Uploaded Image</h3>
+      
+      <img src="{{ uploaded_image }}" alt="Uploaded Image" style="max-width: 100%; border-radius: 10px;" />
 
-    <h3>Result</h3>
-    <!-- Display the result -->
-    {% if output == "REAL" %}
-    <h4 class="mx-auto">Result: <span style="color:green">{{ output }} ({{ confidence }}%)</span>
-      <img src="{% static 'images/thumpup.png' %}" alt="real" height="100px" width="auto">
-    {% else %}
-    <h4 class="mx-auto">Result: <span style="color:red">{{ output }} ({{ confidence }}%)</span>
-      <img src="{% static 'images/thumpdown.png' %}" alt="fake" height="100px" width="auto">
-    {% endif %}
+      <!-- Display the uploaded image using MEDIA_URL and the uploaded_image variable -->
+    
+      {% comment %} <img src="/media/image_uploaded/your_image_file.jpg" alt="Uploaded Image" /> {% endcomment %}
+
+      <!-- Display the result based on the predicted_class -->
+      {% if predicted_class == "REAL" %}
+      <h4 class="mx-auto" style="color: white; font-weight: bold;">Result: <span style="color:green">{{ predicted_class }} </span>
+        <img src="{% static 'images/thumpup.png' %}" alt="real" height="100px" width="auto">
+      </h4>
+      {% else %}
+      <h4 class="mx-auto" style="color: white; font-weight: bold;">Result: <span style="color:red">{{ predicted_class }} </span>
+        <img src="{% static 'images/thumpdown.png' %}" alt="fake" height="100px" width="auto">
+      </h4>
+      {% endif %}
+    </div>
   </div>
 </div>
-{% endblock %}
-
-{% block js_cripts %}
-<script src="{% static 'js/face-api.min.js' %}"></script>
-<script>
-  $(document).ready(function () {
-    const image = document.getElementById("uploaded_image");
-
-    // Load face-api models
-    Promise.all([
-      faceapi.nets.ssdMobilenetv1.loadFromUri('/static/json'),
-      faceapi.nets.tinyFaceDetector.loadFromUri("/static/json")
-    ]).then(() => {
-      // Detect faces in the uploaded image
-      faceapi.detectAllFaces(image).then(detections => {
-        const canvas = faceapi.createCanvasFromMedia(image);
-        document.body.append(canvas);
-        const displaySize = { width: image.width, height: image.height };
-        faceapi.matchDimensions(canvas, displaySize);
-        const resizedDetections = faceapi.resizeResults(detections, displaySize);
-
-        // Draw boxes around detected faces
-        resizedDetections.forEach((result, i) => {
-          var output = '{{ output }}';
-          var confidence = '{{ confidence }}';
-          var drawOptions = { label: output.concat("  ", confidence, "%") };
-          
-          // Set box color based on result
-          if (output == 'REAL') {
-            drawOptions["boxColor"] = "#0f0";  // Green for real
-          } else if (output == 'FAKE') {
-            drawOptions["boxColor"] = "#f00";  // Red for fake
-          }
-
-          // Draw the box on the canvas
-          var box = { x: resizedDetections[i].box.x, y: resizedDetections[i].box.y, height: resizedDetections[i].box.height, width: resizedDetections[i].box.width };
-          const drawBox = new faceapi.draw.DrawBox(box, drawOptions);
-          drawBox.draw(canvas);
-        });
-      });
-    });
-  });
-</script>
 {% endblock %}
